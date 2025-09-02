@@ -2,7 +2,11 @@ import { Agent, getTestUrl } from "@xmtp/agent-sdk";
 import { loadEnvFile } from "node:process";
 import { SiteAssist } from "./SiteAssist";
 
-loadEnvFile(".env");
+try {
+  loadEnvFile(".env");
+} catch {
+  console.log("No .env file found");
+}
 
 const agent = await Agent.create(undefined, {
   dbPath: null,
