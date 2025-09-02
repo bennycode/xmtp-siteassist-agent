@@ -1,6 +1,7 @@
 import { Agent, getTestUrl } from "@xmtp/agent-sdk";
 import { loadEnvFile } from "node:process";
 import { SiteAssist } from "./SiteAssist";
+import { HealthCheck } from "./HealthCheck";
 
 try {
   loadEnvFile(".env");
@@ -17,6 +18,7 @@ agent.on("error", (error) => {
 });
 
 agent.on("start", () => {
+  HealthCheck();
   console.log(`We are online: ${getTestUrl(agent)}`);
 });
 
