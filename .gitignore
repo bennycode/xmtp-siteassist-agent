@@ -1,0 +1,4 @@
+node_modules
+.env
+# Exclude XMTP databases
+xmtp-*

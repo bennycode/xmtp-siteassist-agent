@@ -1,0 +1,29 @@
+{
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/bennycode/xmtp-siteassist-agent/issues"
+  },
+  "dependencies": {
+    "@xmtp/agent-sdk": "^0.0.7",
+    "tsx": "^4.20.5"
+  },
+  "description": "",
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "typescript": "^5.9.2"
+  },
+  "homepage": "https://github.com/bennycode/xmtp-siteassist-agent#readme",
+  "keywords": [],
+  "license": "ISC",
+  "main": "index.js",
+  "name": "xmtp-siteassist-agent",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bennycode/xmtp-siteassist-agent.git"
+  },
+  "scripts": {
+    "start": "tsx src/index.ts"
+  },
+  "type": "module",
+  "version": "1.0.0"
+}
