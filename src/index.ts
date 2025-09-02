@@ -18,7 +18,7 @@ agent.on("error", (error) => {
 });
 
 agent.on("start", () => {
-  HealthCheck();
+  HealthCheck(agent);
   console.log(`We are online: ${getTestUrl(agent)}`);
 });
 
