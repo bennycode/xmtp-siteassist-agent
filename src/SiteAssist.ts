@@ -1,4 +1,4 @@
-import { AgentMiddleware, isText } from "@xmtp/agent-sdk";
+import { AgentContext, AgentMiddleware, isText } from "@xmtp/agent-sdk";
 import assert from "node:assert";
 import { createHash } from "node:crypto";
 
@@ -25,53 +25,55 @@ function bytesToUuid(b: Uint8Array): string {
   ].join("-");
 }
 
-export const SiteAssist: AgentMiddleware<unknown> = async (ctx) => {
-  if (!isText(ctx.message)) {
-    return;
-  }
+export function SiteAssist(siteAssistKey: string): AgentMiddleware<unknown> {
+  return async (ctx: AgentContext, next) => {
+    if (!isText(ctx.message)) {
+      return;
+    }
 
-  if ((await ctx.getSenderAddress()) === ctx.getOwnAddress()) {
-    return;
-  }
+    if ((await ctx.getSenderAddress()) === ctx.getOwnAddress()) {
+      return;
+    }
 
-  const domain = `api.siteassist.io`;
-  const userId = await ctx.getSenderAddress();
-  const conversationId = crypto.randomUUID();
-  assert(process.env.SITEASSIST_KEY);
-  const siteAssistKey = process.env.SITEASSIST_KEY;
-  const text = ctx.message.content;
-  const customerId = uuidv4FromId(userId);
-  const chatId = uuidv4FromId(conversationId);
+    const domain = `api.siteassist.io`;
+    const userId = await ctx.getSenderAddress();
+    const conversationId = crypto.randomUUID();
+    const text = ctx.message.content;
+    const customerId = uuidv4FromId(userId);
+    const chatId = uuidv4FromId(conversationId);
 
-  await fetch(`https://${domain}/v1/customers/${customerId}`, {
-    headers: {
-      "x-siteassist-key": siteAssistKey,
-    },
-  });
-
-  const res = await fetch(
-    `https://${domain}/v1/customers/${customerId}/chats/${chatId}/chat`,
-    {
-      method: "POST",
-      body: JSON.stringify({
-        id: chatId,
-        streaming: false,
-        message: {
-          role: "user",
-          parts: [{ type: "text", text }],
-        },
-      }),
+    await fetch(`https://${domain}/v1/customers/${customerId}`, {
       headers: {
-        "Content-Type": "application/json",
         "x-siteassist-key": siteAssistKey,
       },
-    }
-  );
+    });
 
-  if (res.ok) {
-    const responseText = await res.text();
-    ctx.sendText(responseText);
-  } else {
-    console.error("Something went wrong", res);
-  }
-};
+    const res = await fetch(
+      `https://${domain}/v1/customers/${customerId}/chats/${chatId}/chat`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          id: chatId,
+          streaming: false,
+          message: {
+            role: "user",
+            parts: [{ type: "text", text }],
+          },
+        }),
+        headers: {
+          "Content-Type": "application/json",
+          "x-siteassist-key": siteAssistKey,
+        },
+      }
+    );
+
+    if (res.ok) {
+      const responseText = await res.text();
+      ctx.sendText(responseText);
+    } else {
+      console.error("Something went wrong", res);
+    }
+
+    next();
+  };
+}
