@@ -1,20 +1,11 @@
 import { Agent, getTestUrl } from "@xmtp/agent-sdk";
-import http from "node:http";
+import * as http from "http";
 
 export const HealthCheck = async <ContentTypes>(agent: Agent<ContentTypes>) => {
-  const startedAt = new Date();
-
   const server = http.createServer((req, res) => {
-    const response = {
-      agent: "xmtp-siteassist-agent",
-      startedAt: startedAt.toISOString(),
-      status: "ok",
-      testUrl: getTestUrl(agent),
-      uptimeSec: process.uptime(),
-    };
-
-    res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(JSON.stringify(response));
+    const testUrl = getTestUrl(agent);
+    res.writeHead(302, { Location: testUrl });
+    res.end();
   });
 
   const port = parseInt(process.env.PORT || "3000", 10);
