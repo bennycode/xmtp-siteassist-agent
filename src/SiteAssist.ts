@@ -35,6 +35,8 @@ export function SiteAssist(siteAssistKey: string): AgentMiddleware<unknown> {
       return;
     }
 
+    void ctx.sendReaction("👀");
+
     const domain = `api.siteassist.io`;
     const userId = await ctx.getSenderAddress();
     const conversationId = crypto.randomUUID();

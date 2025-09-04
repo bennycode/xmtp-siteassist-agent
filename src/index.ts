@@ -18,13 +18,6 @@ agent.on("error", (error) => {
   console.log("Caught error", error);
 });
 
-agent.on(
-  "message",
-  withFilter(f.textOnly, (ctx) => {
-    ctx.sendReaction("👀");
-  })
-);
-
 agent.on("start", () => {
   HealthCheck(agent);
   console.log(`We are online: ${getTestUrl(agent)}`);
