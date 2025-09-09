@@ -1,9 +1,9 @@
 import { AgentContext, AgentMiddleware, f, isText } from "@xmtp/agent-sdk";
 import { uuidv4FromId } from "./util";
 
-export function SiteAssist(siteAssistKey: string): AgentMiddleware<unknown> {
+export function SiteAssist(siteAssistKey: string): AgentMiddleware {
   return async (ctx: AgentContext, next) => {
-    ctx.sendReaction("👀");
+    await ctx.sendReaction("👀");
 
     const domain = `api.siteassist.io`;
     const userId = await ctx.getSenderAddress();

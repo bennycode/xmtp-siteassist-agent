@@ -11,8 +11,10 @@ try {
   console.log("No .env file found");
 }
 
-const agent = await Agent.create(undefined, {
-  dbPath: null,
+const agent = await Agent.createFromEnv();
+
+agent.on("dm", (ctx) => {
+  ctx.conversation.send("Hello! 👋");
 });
 
 agent.on("start", () => {
@@ -22,7 +24,6 @@ agent.on("start", () => {
 
 assert(process.env.SITEASSIST_KEY);
 
-agent.use(OnlyText());
-agent.use(SiteAssist(process.env.SITEASSIST_KEY));
+agent.use([OnlyText(), SiteAssist(process.env.SITEASSIST_KEY)]);
 
 await agent.start();
