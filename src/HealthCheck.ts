@@ -2,7 +2,7 @@ import { Agent, getTestUrl } from "@xmtp/agent-sdk";
 import * as http from "http";
 
 export const HealthCheck = async <ContentTypes>(agent: Agent<ContentTypes>) => {
-  const server = http.createServer((req, res) => {
+  const server = http.createServer((_, res) => {
     const testUrl = getTestUrl(agent);
     res.writeHead(302, { Location: testUrl });
     res.end();
