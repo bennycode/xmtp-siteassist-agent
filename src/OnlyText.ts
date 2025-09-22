@@ -1,8 +1,8 @@
-import { AgentContext, AgentMiddleware, isText } from "@xmtp/agent-sdk";
+import { AgentMiddleware, filter, MessageContext } from "@xmtp/agent-sdk";
 
 export function OnlyText(): AgentMiddleware {
-  return async ({ message }: AgentContext, next) => {
-    if (!isText(message)) {
+  return async ({ message }: MessageContext, next) => {
+    if (!filter.isText(message)) {
       return;
     }
 

@@ -1,9 +1,10 @@
 import assert from "node:assert";
-import { Agent, getTestUrl } from "@xmtp/agent-sdk";
+import { getTestUrl } from "@xmtp/agent-sdk/debug";
 import { loadEnvFile } from "node:process";
 import { HealthCheck } from "./HealthCheck";
 import { OnlyText } from "./OnlyText";
 import { SiteAssist } from "./SiteAssist";
+import { Agent } from "@xmtp/agent-sdk";
 
 try {
   loadEnvFile(".env");
@@ -15,17 +16,13 @@ try {
 
 const agent = await Agent.createFromEnv();
 
-agent.on("dm", (ctx) => {
-  ctx.conversation.send("Hello! 👋");
-});
-
 agent.on("unhandledError", (error) => {
   console.log("Caught error", error);
 });
 
-agent.on("start", () => {
+agent.on("start", (ctx) => {
   HealthCheck(agent);
-  console.log(`We are online: ${getTestUrl(agent)}`);
+  console.log(`We are online: ${getTestUrl(ctx.client)}`);
 });
 
 agent.use([OnlyText(), SiteAssist(process.env.SITEASSIST_KEY)]);
