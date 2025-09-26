@@ -5,7 +5,7 @@ import {
 } from "@xmtp/agent-sdk";
 import { AIMessage, ChatCompletionResponse } from "./types";
 
-const SITEASSIST_API_URI = "https://api.siteassist.io";
+const SITEASSIST_API_URL = "https://api.siteassist.io";
 
 export function SiteAssist(siteassistSecretKey: string): AgentMiddleware {
   return async (ctx: MessageContext, next) => {
@@ -31,7 +31,7 @@ export function SiteAssist(siteassistSecretKey: string): AgentMiddleware {
     );
 
     // API Doc https://api.siteassist.io/v2#tag/chat-completions/post/chat/completions
-    const res = await fetch(`${SITEASSIST_API_URI}/v2/chat/completions`, {
+    const res = await fetch(`${SITEASSIST_API_URL}/v2/chat/completions`, {
       method: "POST",
       body: JSON.stringify({
         messages,
