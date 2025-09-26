@@ -1,45 +1,60 @@
-import { AgentMiddleware, MessageContext } from "@xmtp/agent-sdk";
-import { uuidv4FromId } from "./util";
+import {
+  AgentMiddleware,
+  MessageContext,
+  SortDirection,
+} from "@xmtp/agent-sdk";
+import { AIMessage, ChatCompletionResponse } from "./types";
 
-export function SiteAssist(siteAssistKey: string): AgentMiddleware {
+const SITEASSIST_API_URI = "https://api.siteassist.io";
+
+export function SiteAssist(siteassistSecretKey: string): AgentMiddleware {
   return async (ctx: MessageContext, next) => {
     await ctx.sendReaction("👀");
 
-    const domain = `api.siteassist.io`;
-    const userId = await ctx.getSenderAddress();
-    const conversationId = crypto.randomUUID();
-    const text = ctx.message.content;
-    const customerId = uuidv4FromId(userId);
-    const chatId = uuidv4FromId(conversationId);
+    // Get last 10 messages to provide the AI a history of the conversation
+    const messagesHistory = await ctx.conversation.messages({
+      limit: 10,
+      contentTypes: [1, 6],
+      direction: SortDirection.Descending,
+    });
 
-    await fetch(`https://${domain}/v1/customers/${customerId}`, {
+    // Convert XMTP messages to AI Messages
+    const messages = messagesHistory.toReversed().map(
+      (message) =>
+        ({
+          role:
+            message.senderInboxId === ctx.message.senderInboxId
+              ? "user"
+              : "assistant",
+          content: String(message.content),
+        } satisfies AIMessage)
+    );
+
+    // API Doc https://api.siteassist.io/v2#tag/chat-completions/post/chat/completions
+    const res = await fetch(`${SITEASSIST_API_URI}/v2/chat/completions`, {
+      method: "POST",
+      body: JSON.stringify({
+        messages,
+      }),
       headers: {
-        "x-siteassist-key": siteAssistKey,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${siteassistSecretKey}`,
       },
     });
 
-    const res = await fetch(
-      `https://${domain}/v1/customers/${customerId}/chats/${chatId}/chat`,
-      {
-        method: "POST",
-        body: JSON.stringify({
-          id: chatId,
-          streaming: false,
-          message: {
-            role: "user",
-            parts: [{ type: "text", text }],
-          },
-        }),
-        headers: {
-          "Content-Type": "application/json",
-          "x-siteassist-key": siteAssistKey,
-        },
-      }
-    );
-
     if (res.ok) {
-      const responseText = await res.text();
-      ctx.sendText(responseText);
+      const { steps } = (await res.json()) as ChatCompletionResponse;
+      const finalStep = steps[steps.length - 1];
+
+      if (finalStep) {
+        const replyContent = finalStep.content
+          .filter((content) => content.type === "text")
+          .map((c) => c.text?.trim())
+          .filter((text) => !!text)
+          .join("\n\n");
+
+        await ctx.sendTextReply(replyContent);
+      }
     } else {
       console.error("Something went wrong", res);
     }

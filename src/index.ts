@@ -11,7 +11,7 @@ try {
 } catch {
   console.log("No .env file found");
 } finally {
-  assert(process.env.SITEASSIST_KEY);
+  assert(process.env.SITEASSIST_SECRET_KEY);
 }
 
 const agent = await Agent.createFromEnv();
@@ -25,6 +25,6 @@ agent.on("start", (ctx) => {
   console.log(`We are online: ${getTestUrl(ctx.client)}`);
 });
 
-agent.use([OnlyText(), SiteAssist(process.env.SITEASSIST_KEY)]);
+agent.use([OnlyText(), SiteAssist(process.env.SITEASSIST_SECRET_KEY)]);
 
 await agent.start();
