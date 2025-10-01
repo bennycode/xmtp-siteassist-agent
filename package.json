@@ -4,10 +4,10 @@
     "url": "https://github.com/bennycode/xmtp-siteassist-agent/issues"
   },
   "dependencies": {
-    "@types/node": "^24.3.0",
-    "@xmtp/agent-sdk": "^1.0.0",
-    "tsx": "^4.20.5",
-    "typescript": "^5.9.2"
+    "@types/node": "^24.6.1",
+    "@xmtp/agent-sdk": "^1.1.1",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
   },
   "description": "",
   "homepage": "https://github.com/bennycode/xmtp-siteassist-agent#readme",
