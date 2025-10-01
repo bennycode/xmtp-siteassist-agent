@@ -1,16 +1,15 @@
-import assert from "node:assert";
+import { Agent } from "@xmtp/agent-sdk";
 import { getTestUrl } from "@xmtp/agent-sdk/debug";
+import assert from "node:assert";
 import { loadEnvFile } from "node:process";
 import { HealthCheck } from "./HealthCheck";
-import { OnlyText } from "./OnlyText";
-import { SiteAssist } from "./SiteAssist";
-import { Agent } from "@xmtp/agent-sdk";
 
 try {
   loadEnvFile(".env");
 } catch {
   console.log("No .env file found");
 } finally {
+  // https://app.siteassist.io/.../.../api-keys/secrets
   assert(process.env.SITEASSIST_SECRET_KEY);
 }
 
@@ -25,6 +24,14 @@ agent.on("start", (ctx) => {
   console.log(`We are online: ${getTestUrl(ctx.client)}`);
 });
 
-agent.use([OnlyText(), SiteAssist(process.env.SITEASSIST_SECRET_KEY)]);
+agent.on("dm", (ctx) => {
+  ctx.conversation.send("Hello you!");
+});
+
+agent.on("group", (ctx) => {
+  ctx.conversation.send("Hello everyone!");
+});
+
+// agent.use([OnlyText(), SiteAssist(process.env.SITEASSIST_SECRET_KEY)]);
 
 await agent.start();
