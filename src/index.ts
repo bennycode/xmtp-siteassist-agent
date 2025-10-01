@@ -35,6 +35,7 @@ agent.on("start", (ctx) => {
 
 agent.on("text", (ctx) => {
   console.log(`Received text: ${ctx.message.content}`);
+  ctx.conversation.send(`Echo: ${ctx.message.content}`);
 });
 
 agent.on("dm", (ctx) => {
